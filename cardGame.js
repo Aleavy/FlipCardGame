@@ -11,9 +11,23 @@ const listOfImgSrcs = [
     'img/star_badge.webp',
     'img/sun.webp'
 ];
-let card_flipped = 0;
-let selectedCard = null;
-
+let previus_card = null;
+const cards = [];
+function shuffle(array) {
+    let currentIndex = array.length;
+  
+    // While there remain elements to shuffle...
+    while (currentIndex != 0) {
+  
+      // Pick a remaining element...
+      let randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+  
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+  }
 
 const createCard = (father) => {
     console.log(listOfImgSrcs)
@@ -34,42 +48,48 @@ const createCard = (father) => {
         card.appendChild(card_front)
         card.appendChild(card_back)        
 
-        father.appendChild(card);
+        cards.push(card);
     };
     listOfImgSrcs.pop()
     return;
+}
+
+const appendingElements = (array)=>{
+    array.forEach(element =>{
+        listOfItems.appendChild(element)
+    })
 }
 
 const cardGenerator = (father, num) =>{
     for (let i = 0; i < num; i++){
         createCard(father);
     }
+    shuffle(cards)
+    appendingElements(cards)
+
 }
 
-function checkFlipped(card_flipped){
-    if (card_flipped === 2){
-        return false;
-    }else{
-        return true;
-    }
-}
+
 
 function flipCard(){
-    if (checkFlipped(card_flipped)){
-    if (this.querySelector('img').src == selectedCard){
-        card_flipped = -1
-    }
+
     this.classList.add('flip')
-    selectedCard = this.querySelector('img').src
-    card_flipped++
-    }else {
-        return;
-    }
+    setTimeout(()=>{
+        if (!previus_card){
+            previus_card = this
+           return true;
+       }
+       if (this.querySelector('img').src != previus_card.querySelector('img').src){
+           
+           this.classList.remove('flip')
+           previus_card.classList.remove('flip')
+           previus_card = null
+       }else{
+           previus_card = null
+       }
+    }, 800)
 }
-
-
 
 cardGenerator(listOfItems, 10)
 
-const cards = document.querySelectorAll('.card')
 cards.forEach((card) => card.addEventListener('click', flipCard))
